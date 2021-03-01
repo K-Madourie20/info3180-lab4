@@ -1,3 +1,20 @@
 body {
     padding-top: 5rem;
 }
+
+#imgs, img{
+    width: 320px;
+	height:250px;
+    display: inline-block;
+    margin: 10px;
+
+	
+}
+
+#list{
+    list-style: none;
+}
+
+#info{
+	background-color:yellow;
+}
