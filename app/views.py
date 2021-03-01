@@ -8,6 +8,7 @@ import os
 from app import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
+from app.forms import UploadForm
 
 
 ###
@@ -23,7 +24,7 @@ def home():
 @app.route('/about/')
 def about():
     """Render the website's about page."""
-    return render_template('about.html', name="Mary Jane")
+    return render_template('about.html', name="Kodey Madourie")
 
 
 @app.route('/upload', methods=['POST', 'GET'])
@@ -32,17 +33,34 @@ def upload():
         abort(401)
 
     # Instantiate your form class
+    upload = UploadForm()
 
     # Validate file upload on submit
-    if request.method == 'POST':
+    if request.method == 'POST' and upload.validate():
         # Get file data and save to your uploads folder
-
+        file = request.files['photo']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
         flash('File Saved', 'success')
         return redirect(url_for('home'))
 
     return render_template('upload.html')
 
-
+def get_uploaded_images():
+    rootdir = os.getcwd()
+    list = []
+    for subdir, dirs, files in os.walk(rootdir + './app/static/uploads/'):
+        for file in files:
+            list.append(file)
+            return list
+        
+@app.route('/files')
+def files():
+    if session.get('logged_in'):
+        images = get_uploaded_images()
+        return render_template('files.html', form=images)
+    abort(401)
+    
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     error = None
